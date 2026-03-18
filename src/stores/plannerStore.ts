@@ -1,9 +1,11 @@
 import { create } from 'zustand';
-import { Goal, Milestone } from '@/types';
+import { Goal, Milestone, DailyTask, Habit } from '@/types';
 import { generateId } from '@/lib/utils';
 
 interface PlannerState {
   goals: Goal[];
+  dailyTasks: DailyTask[];
+  habits: Habit[];
   currentTimeframe: string;
   addGoal: (title: string, category: Goal['category'], timeframe: Goal['timeframe'], targetDate: string) => Goal;
   updateGoal: (id: string, updates: Partial<Goal>) => void;
@@ -14,6 +16,13 @@ interface PlannerState {
   setCurrentTimeframe: (timeframe: string) => void;
   getGoalsByTimeframe: (timeframe: string) => Goal[];
   getGoalsByCategory: (category: string) => Goal[];
+  addDailyTask: (title: string, priority: DailyTask['priority'], date?: string) => DailyTask;
+  toggleDailyTask: (id: string) => void;
+  deleteDailyTask: (id: string) => void;
+  getDailyTasksByDate: (date: string) => DailyTask[];
+  addHabit: (title: string, frequency: Habit['frequency'], color: string) => Habit;
+  toggleHabitDate: (id: string, date: string) => void;
+  deleteHabit: (id: string) => void;
 }
 
 export const usePlannerStore = create<PlannerState>((set, get) => ({
@@ -114,5 +123,99 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
   getGoalsByCategory: (category) => {
     if (category === 'all') return get().goals;
     return get().goals.filter((g) => g.category === category);
+  },
+
+  dailyTasks: [
+    {
+      id: 'dt-1', title: 'Review daily goals', completed: false,
+      date: new Date().toISOString().split('T')[0], priority: 'high',
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'dt-2', title: 'Work on NBOTION features', completed: false,
+      date: new Date().toISOString().split('T')[0], priority: 'high',
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'dt-3', title: 'Read for 30 minutes', completed: false,
+      date: new Date().toISOString().split('T')[0], priority: 'medium',
+      category: 'education',
+      createdAt: new Date().toISOString(),
+    },
+  ],
+
+  habits: [
+    {
+      id: 'h-1', title: 'Morning workout', frequency: 'daily',
+      currentStreak: 3, bestStreak: 14, completedDates: [],
+      color: '#10B981', createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'h-2', title: 'Read a book', frequency: 'daily',
+      currentStreak: 7, bestStreak: 21, completedDates: [],
+      color: '#8B5CF6', createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'h-3', title: 'Meditate', frequency: 'daily',
+      currentStreak: 1, bestStreak: 10, completedDates: [],
+      color: '#3B82F6', createdAt: new Date().toISOString(),
+    },
+  ],
+
+  addDailyTask: (title, priority, date) => {
+    const task: DailyTask = {
+      id: generateId(), title, completed: false, priority,
+      date: date || new Date().toISOString().split('T')[0],
+      createdAt: new Date().toISOString(),
+    };
+    set((state) => ({ dailyTasks: [...state.dailyTasks, task] }));
+    return task;
+  },
+
+  toggleDailyTask: (id) => {
+    set((state) => ({
+      dailyTasks: state.dailyTasks.map((t) =>
+        t.id === id ? { ...t, completed: !t.completed, completedAt: !t.completed ? new Date().toISOString() : undefined } : t
+      ),
+    }));
+  },
+
+  deleteDailyTask: (id) => {
+    set((state) => ({ dailyTasks: state.dailyTasks.filter((t) => t.id !== id) }));
+  },
+
+  getDailyTasksByDate: (date) => {
+    return get().dailyTasks.filter((t) => t.date === date);
+  },
+
+  addHabit: (title, frequency, color) => {
+    const habit: Habit = {
+      id: generateId(), title, frequency, color,
+      currentStreak: 0, bestStreak: 0, completedDates: [],
+      createdAt: new Date().toISOString(),
+    };
+    set((state) => ({ habits: [...state.habits, habit] }));
+    return habit;
+  },
+
+  toggleHabitDate: (id, date) => {
+    set((state) => ({
+      habits: state.habits.map((h) => {
+        if (h.id !== id) return h;
+        const alreadyDone = h.completedDates.includes(date);
+        const completedDates = alreadyDone
+          ? h.completedDates.filter((d) => d !== date)
+          : [...h.completedDates, date];
+        const currentStreak = alreadyDone ? Math.max(0, h.currentStreak - 1) : h.currentStreak + 1;
+        return {
+          ...h, completedDates, currentStreak,
+          bestStreak: Math.max(h.bestStreak, currentStreak),
+        };
+      }),
+    }));
+  },
+
+  deleteHabit: (id) => {
+    set((state) => ({ habits: state.habits.filter((h) => h.id !== id) }));
   },
 }));

@@ -4,17 +4,18 @@ import { cn } from '@/lib/utils';
 import {
   FileText, MessageSquare, LayoutDashboard, Target, Calendar,
   Heart, Plug, Bot, Settings, Plus, ChevronRight, Search,
-  Lock, Database
+  Lock, Database, TrendingUp, StickyNote
 } from 'lucide-react';
 import { AppModule } from '@/types';
 
 const modules: { id: AppModule; label: string; icon: React.ElementType }[] = [
-  { id: 'workspace', label: 'Workspace', icon: FileText },
+  { id: 'workspace', label: 'Notes', icon: StickyNote },
   { id: 'messaging', label: 'Messages', icon: MessageSquare },
   { id: 'projects', label: 'Projects', icon: LayoutDashboard },
   { id: 'planner', label: 'Planner & Goals', icon: Target },
   { id: 'calendar', label: 'Calendar', icon: Calendar },
   { id: 'health', label: 'Health & Data', icon: Heart },
+  { id: 'growth', label: 'Growth', icon: TrendingUp },
   { id: 'integrations', label: 'Integrations', icon: Plug },
   { id: 'ai-agents', label: 'AI Agents', icon: Bot },
   { id: 'settings', label: 'Settings', icon: Settings },

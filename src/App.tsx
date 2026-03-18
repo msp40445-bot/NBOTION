@@ -9,6 +9,7 @@ import { HealthView } from '@/components/health/HealthView';
 import { IntegrationsView } from '@/components/integrations/IntegrationsView';
 import { AIAgentsView } from '@/components/ai/AIAgentsView';
 import { SettingsView } from '@/components/layout/SettingsView';
+import { GrowthView } from '@/components/growth/GrowthView';
 import { LockScreen } from '@/components/layout/LockScreen';
 import { useAppStore } from '@/stores/appStore';
 
@@ -29,6 +30,7 @@ function App() {
       case 'health': return <HealthView />;
       case 'integrations': return <IntegrationsView />;
       case 'ai-agents': return <AIAgentsView />;
+      case 'growth': return <GrowthView />;
       case 'settings': return <SettingsView />;
       default: return <WorkspaceView />;
     }

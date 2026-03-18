@@ -11,6 +11,7 @@ export interface Page {
   isDatabase?: boolean;
   databaseSchema?: DatabaseColumn[];
   databaseRows?: DatabaseRow[];
+  isFavorite?: boolean;
 }
 
 export interface DatabaseColumn {
@@ -58,6 +59,10 @@ export interface Message {
   reactions: Reaction[];
   attachments: Attachment[];
   edited?: boolean;
+  replyTo?: string;
+  replyToContent?: string;
+  replyToAuthor?: string;
+  deleted?: boolean;
 }
 
 export interface Reaction {
@@ -145,6 +150,30 @@ export interface Milestone {
   completedAt?: string;
 }
 
+export interface DailyTask {
+  id: string;
+  title: string;
+  completed: boolean;
+  date: string;
+  priority: 'high' | 'medium' | 'low';
+  category?: string;
+  goalId?: string;
+  createdAt: string;
+  completedAt?: string;
+}
+
+export interface Habit {
+  id: string;
+  title: string;
+  icon?: string;
+  frequency: 'daily' | 'weekdays' | 'weekly';
+  currentStreak: number;
+  bestStreak: number;
+  completedDates: string[];
+  color: string;
+  createdAt: string;
+}
+
 export interface CalendarEvent {
   id: string;
   title: string;
@@ -202,27 +231,40 @@ export interface Integration {
   lastSync?: string;
 }
 
+export type AIModelId = 'qwen-2.5-3b' | 'llama-3.2-3b' | 'phi-3.5-mini' | 'gemma-2b' | 'deepseek-coder-1.3b';
+
 export interface AIAgent {
   id: string;
   name: string;
   description?: string;
-  model: 'qwen-2.5-3b' | 'qwen-2.5-7b' | 'custom';
+  model: AIModelId;
   systemPrompt: string;
   capabilities: AgentCapability[];
-  status: 'idle' | 'running' | 'error';
+  status: 'idle' | 'running' | 'loading' | 'error';
   createdAt: string;
   lastRun?: string;
   logs: AgentLog[];
+  chatHistory: AIChatMessage[];
+  modelLoadProgress?: number;
+  modelLoadStatus?: string;
 }
 
-export type AgentCapability = 
-  | 'read-pages' 
-  | 'write-pages' 
-  | 'read-messages' 
+export interface AIChatMessage {
+  id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp: string;
+  isStreaming?: boolean;
+}
+
+export type AgentCapability =
+  | 'read-pages'
+  | 'write-pages'
+  | 'read-messages'
   | 'send-messages'
-  | 'manage-issues' 
-  | 'github-access' 
-  | 'create-pr' 
+  | 'manage-issues'
+  | 'github-access'
+  | 'create-pr'
   | 'debug-app'
   | 'dom-access'
   | 'read-calendar'
@@ -236,4 +278,12 @@ export interface AgentLog {
   message: string;
 }
 
-export type AppModule = 'workspace' | 'messaging' | 'projects' | 'planner' | 'calendar' | 'health' | 'integrations' | 'ai-agents' | 'settings';
+export type AppModule = 'workspace' | 'messaging' | 'projects' | 'planner' | 'calendar' | 'health' | 'integrations' | 'ai-agents' | 'settings' | 'growth';
+
+export interface UserProfile {
+  name: string;
+  email: string;
+  avatar?: string;
+  timezone: string;
+  joinedAt: string;
+}
