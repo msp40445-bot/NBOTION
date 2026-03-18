@@ -11,6 +11,7 @@ interface MessagingState {
   setCurrentChannel: (id: string | null) => void;
   sendMessage: (channelId: string, content: string, authorName?: string) => void;
   deleteMessage: (channelId: string, messageId: string) => void;
+  editMessage: (channelId: string, messageId: string, content: string) => void;
   addReaction: (channelId: string, messageId: string, emoji: string) => void;
 }
 
@@ -109,6 +110,17 @@ export const useMessagingStore = create<MessagingState>((set) => ({
       messages: {
         ...state.messages,
         [channelId]: (state.messages[channelId] ?? []).filter((m) => m.id !== messageId),
+      },
+    }));
+  },
+
+  editMessage: (channelId, messageId, content) => {
+    set((state) => ({
+      messages: {
+        ...state.messages,
+        [channelId]: (state.messages[channelId] ?? []).map((m) =>
+          m.id === messageId ? { ...m, content, edited: true } : m
+        ),
       },
     }));
   },
